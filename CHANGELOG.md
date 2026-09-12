@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.6.1](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/compare/v3.6.0...v3.6.1) (2026-09-12)
+
+### Fixed
+
+* handle OPENWEATHER_ONECALL_ERROR and retry instead of getting stuck ([521ed6c](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/521ed6c9161030e9e60f3bf5b25af50f4065a147))
+
+### Performance Improvements
+
+* hoist weather type lookup table to module constant ([b1939e5](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/b1939e5888f90904196848612e2be8ef62c0c7b9))
+* reuse Intl.DateTimeFormat instance across daily forecast entries ([7b905e4](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/7b905e4e776ce71bfa0761a5d87418a2af9d7f94))
+
+### Chores
+
+* update devDependencies ([c0b6cee](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/c0b6cee2fa4c74f64f3fa19fa4f3f3eca590ff34))
+* upgrade GitHub actions ([f009be2](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/f009be2edc69a738a0d915a5ce0a438252eca0d2))
 ## [3.6.0](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/compare/v3.5.1...v3.6.0) (2026-03-08)
 
 
