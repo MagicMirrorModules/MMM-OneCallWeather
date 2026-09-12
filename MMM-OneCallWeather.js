@@ -143,12 +143,13 @@ Module.register('MMM-OneCallWeather', {
 
   processOnecall(data) {
     const wsfactor = this.utils.getWindSpeedFactor(this.config.units, this.config.windUnits)
+    const weekdayFormatter = new Intl.DateTimeFormat(config.language, { weekday: 'short' })
     const current = []
 
     if (Object.hasOwn(data, 'current')) {
       const currently = {
         date: new Date((data.current.dt + data.timezone_offset) * 1000),
-        dayOfWeek: new Intl.DateTimeFormat(config.language, { weekday: 'short' }).format(data.current.dt),
+        dayOfWeek: weekdayFormatter.format(data.current.dt),
         windSpeed: (data.current.wind_speed * wsfactor).toFixed(0),
         windDirection: data.current.wind_deg,
         sunrise: new Date((data.current.sunrise + data.timezone_offset) * 1000),
@@ -261,7 +262,7 @@ Module.register('MMM-OneCallWeather', {
         }
 
         forecastData = {
-          dayOfWeek: new Intl.DateTimeFormat(config.language, { weekday: 'short' }).format(day.dt * 1000),
+          dayOfWeek: weekdayFormatter.format(day.dt * 1000),
           date: new Date((day.dt + data.timezone_offset) * 1000),
           sunrise: new Date((day.sunrise + data.timezone_offset) * 1000),
           sunset: new Date((day.sunset + data.timezone_offset) * 1000),
