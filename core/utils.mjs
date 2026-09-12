@@ -158,35 +158,38 @@ export function cardinalWindDirection(windDir) {
 }
 
 /**
+ * Lookup table for OpenWeatherMap icon codes to descriptive weather type names.
+ */
+const WEATHER_TYPES = {
+  '01d': 'day-clear-sky',
+  '02d': 'day-few-clouds',
+  '03d': 'day-scattered-clouds',
+  '04d': 'day-broken-clouds',
+  '09d': 'day-shower-rain',
+  '10d': 'day-rain',
+  '11d': 'day-thunderstorm',
+  '13d': 'day-snow',
+  '50d': 'day-mist',
+  '01n': 'night-clear-sky',
+  '02n': 'night-few-clouds',
+  '03n': 'night-scattered-clouds',
+  '04n': 'night-broken-clouds',
+  '09n': 'night-shower-rain',
+  '10n': 'night-rain',
+  '11n': 'night-thunderstorm',
+  '13n': 'night-snow',
+  '50n': 'night-mist',
+}
+
+/**
  * Convert OpenWeatherMap icon code to a more descriptive name.
  *
  * @param {string} weatherType - OpenWeatherMap icon code (e.g., "01d", "10n").
  * @returns {string|null} Descriptive weather type name or null if unknown.
  */
 export function convertWeatherType(weatherType) {
-  const weatherTypes = {
-    '01d': 'day-clear-sky',
-    '02d': 'day-few-clouds',
-    '03d': 'day-scattered-clouds',
-    '04d': 'day-broken-clouds',
-    '09d': 'day-shower-rain',
-    '10d': 'day-rain',
-    '11d': 'day-thunderstorm',
-    '13d': 'day-snow',
-    '50d': 'day-mist',
-    '01n': 'night-clear-sky',
-    '02n': 'night-few-clouds',
-    '03n': 'night-scattered-clouds',
-    '04n': 'night-broken-clouds',
-    '09n': 'night-shower-rain',
-    '10n': 'night-rain',
-    '11n': 'night-thunderstorm',
-    '13n': 'night-snow',
-    '50n': 'night-mist',
-  }
-
-  return Object.hasOwn(weatherTypes, weatherType)
-    ? weatherTypes[weatherType]
+  return Object.hasOwn(WEATHER_TYPES, weatherType)
+    ? WEATHER_TYPES[weatherType]
     : null
 }
 
