@@ -87,6 +87,7 @@ Module.register('MMM-OneCallWeather', {
 
     this.forecast = []
     this.loaded = false
+    this.errorMessage = null
     this.scheduleUpdate(this.config.initialLoadDelay)
     this.updateTimer = null
   },
@@ -124,7 +125,18 @@ Module.register('MMM-OneCallWeather', {
       const { data } = payload
       this.forecast = this.processOnecall(data)
       this.loaded = true
+      this.errorMessage = null
       this.updateDom()
+      this.scheduleUpdate()
+    }
+    else if (notification === 'OPENWEATHER_ONECALL_ERROR' && payload.identifier === this.identifier) {
+      Log.error(`${this.name}: Failed to fetch weather data: ${payload.error}`)
+      this.errorMessage = payload.error
+      // Only redraw for the error state if we never managed to load data before
+      if (!this.loaded) {
+        this.updateDom()
+      }
+      // Retry on the normal schedule instead of getting stuck
       this.scheduleUpdate()
     }
   },
@@ -285,7 +297,9 @@ Module.register('MMM-OneCallWeather', {
     }
 
     if (!this.loaded) {
-      wrapper.innerHTML = this.translate('LOADING')
+      wrapper.innerHTML = this.errorMessage
+        ? `Error loading weather data: ${this.errorMessage}`
+        : this.translate('LOADING')
       wrapper.className = 'dimmed light small'
       return wrapper
     }
