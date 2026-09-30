@@ -26,7 +26,6 @@ Module.register('MMM-OneCallWeather', {
     updateInterval: 10 * 60 * 1000, // every 10 minutes
     animationSpeed: 1000,
     updateFadeSpeed: 500,
-    requestDelay: 0,
 
     decimalSymbol: '.',
     fade: true,
@@ -38,7 +37,6 @@ Module.register('MMM-OneCallWeather', {
     iconsetFormat: 'png',
 
     onlyTemp: false,
-    maxHourliesToShow: 30,
     maxDailiesToShow: 6,
     colored: true,
     roundTemp: true,
@@ -115,7 +113,6 @@ Module.register('MMM-OneCallWeather', {
       longitude: this.config.longitude,
       units: this.config.units,
       language: this.config.language,
-      requestDelay: this.config.requestDelay,
     })
   },
 
