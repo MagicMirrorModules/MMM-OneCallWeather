@@ -149,7 +149,6 @@ Module.register('MMM-OneCallWeather', {
     if (Object.hasOwn(data, 'current')) {
       const currently = {
         date: new Date((data.current.dt + data.timezone_offset) * 1000),
-        dayOfWeek: weekdayFormatter.format(data.current.dt),
         windSpeed: (data.current.wind_speed * wsfactor).toFixed(0),
         windDirection: data.current.wind_deg,
         sunrise: new Date((data.current.sunrise + data.timezone_offset) * 1000),
