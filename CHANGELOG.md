@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.6.2](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/compare/v3.6.1...v3.6.2) (2026-09-30)
+
+### Fixed
+
+* accept zero coordinates ([52b7bbd](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/52b7bbd800adfa2b6cccd97463a937589173a530))
+
+### Chores
+
+* update devDependencies ([dd774ba](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/dd774ba4422770a594d20ad757ebb9e3e4a738d1))
+
+### Code Refactoring
+
+* remove unused config options ([4aa9588](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/4aa958849cc7017f7b9c4ff0b847a8a2624abaf7))
+* remove unused current weekday ([7287550](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/72875504f7069d680ecaec6a6bfcf63b7b6265d3))
+
+### Tests
+
+* cover weather data and coordinate handling ([8973c91](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/8973c91d83d928b5b0168d5b045a4e9465703237))
+
 ## [3.6.1](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/compare/v3.6.0...v3.6.1) (2026-09-12)
 
 ### Fixed
