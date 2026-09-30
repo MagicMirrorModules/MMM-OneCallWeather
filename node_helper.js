@@ -24,7 +24,9 @@ module.exports = NodeHelper.create({
         Log.error('No API key configured. Get an API key at https://openweathermap.org/api/one-call-api')
         return
       }
-      if (!config.latitude || !config.longitude) {
+      const coordinates = [config.latitude, config.longitude]
+      const coordinatesMissing = coordinates.some(coordinate => !coordinate && coordinate !== 0)
+      if (coordinatesMissing) {
         Log.error('Latitude and/or longitude not provided.')
         return
       }
