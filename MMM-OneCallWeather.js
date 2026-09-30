@@ -745,8 +745,8 @@ Module.register('MMM-OneCallWeather', {
       const validAlerts = currentWeather.alerts
         .filter(alert =>
           alert?.event
-          && alert.start < alertWindow  // Starts within the configured time window
-          && alert.end > now,             // Is still active (not expired)
+          && alert.start < alertWindow // Starts within the configured time window
+          && alert.end > now, // Is still active (not expired)
         )
         .map(alert => ({
           event: alert.event,
@@ -889,12 +889,12 @@ Module.register('MMM-OneCallWeather', {
     overlay.style.left = '0'
     overlay.style.width = '100vw'
     overlay.style.height = '100vh'
-    overlay.style.zIndex = '99999'        // on top of everything
-    overlay.style.pointerEvents = 'auto'  // ensure overlay captures all clicks
+    overlay.style.zIndex = '99999' // on top of everything
+    overlay.style.pointerEvents = 'auto' // ensure overlay captures all clicks
     // Stop clicks inside overlay from propagating
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
-        removeOverlay()  // clicking outside the box closes
+        removeOverlay() // clicking outside the box closes
       }
     })
     // Close on ESC key for keyboard/mouse users

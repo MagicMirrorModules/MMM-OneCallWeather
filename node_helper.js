@@ -56,7 +56,7 @@ module.exports = NodeHelper.create({
           const now = Math.floor(Date.now() / 1000)
           data.alerts = [
             {
-              sender_name: 'NWS Test Station', // eslint-disable-line camelcase
+              sender_name: 'NWS Test Station',
               event: 'Winter Weather Advisory',
               start: now - 3600,
               end: now + 28800,

@@ -3,8 +3,6 @@
  * These functions have no side effects and can be tested independently.
  */
 
-/* eslint-disable func-style, no-ternary, max-statements, complexity, one-var */
-
 /**
  * Converts mph to Beaufort scale (wind speed).
  *

@@ -8,16 +8,16 @@ let moduleDefinition
 
 const createCurrentWeather = (overrides = {}) => ({
     dt: 1704110400,
-    // eslint-disable-next-line camelcase
+
     wind_speed: 5,
-    // eslint-disable-next-line camelcase
+
     wind_deg: 90,
     sunrise: 1704090000,
     sunset: 1704130000,
     temp: 12.6,
     weather: [{ icon: '01d' }],
     humidity: 55,
-    // eslint-disable-next-line camelcase
+
     feels_like: 11.2,
     ...overrides,
   }),
@@ -52,7 +52,7 @@ describe('processOnecall', () => {
   it('should convert current and daily values using metric units', () => {
     const apiTimestamp = 1704110400,
       result = processWeatherData({
-        // eslint-disable-next-line camelcase
+
         timezone_offset: 3600,
         current: createCurrentWeather({
           rain: { '1h': 2 },
@@ -64,11 +64,11 @@ describe('processOnecall', () => {
           sunset: 1704130000,
           temp: { min: 5.4, max: 14.6 },
           humidity: 60,
-          // eslint-disable-next-line camelcase
+
           wind_speed: 2,
-          // eslint-disable-next-line camelcase
+
           wind_deg: 180,
-          // eslint-disable-next-line camelcase
+
           feels_like: { day: 10 },
           weather: [{ icon: '10d' }],
           rain: 4,
@@ -91,7 +91,7 @@ describe('processOnecall', () => {
 
   it('should default missing precipitation values to zero', () => {
     const result = processWeatherData({
-      // eslint-disable-next-line camelcase
+
       timezone_offset: 0,
       current: createCurrentWeather(),
     })

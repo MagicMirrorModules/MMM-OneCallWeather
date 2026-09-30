@@ -102,12 +102,12 @@ let config = {
       position: 'top_right',
       header: 'Weather Alerts Test (Oklahoma)',
       config: {
-        latitude: '35.4676',    // Oklahoma City (Tornado Alley)
+        latitude: '35.4676', // Oklahoma City (Tornado Alley)
         longitude: '-97.5164',
         apikey: 'YOUR_API_KEY',
         showCurrent: true,
         showForecast: false,
-        showAlerts: true,       // Test alerts feature
+        showAlerts: true, // Test alerts feature
         colored: true,
       },
     },
