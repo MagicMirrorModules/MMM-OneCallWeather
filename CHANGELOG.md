@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.7.0](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/compare/v3.6.2...v3.7.0) (2026-10-03)
+
+### Added
+
+* add showDescription option and map language codes for OpenWeatherMap ([1dac628](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/1dac62805e85cbdf83f4610f837f37982bdea677))
+* show translated core error messages ([ae01b0b](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/ae01b0b9304ed773e3756980a108dcd12e8a2c80))
+* translate weather alert popup and titles ([00f61c0](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/00f61c084e52f9cffbb8bce5f011a2ecfb16e9c5))
+
+### Fixed
+
+* apply decimalSymbol and animationSpeed, remove unused fade option ([65bfd79](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/65bfd79d4e623562ad7c094efcd178a83364ac50))
+* improve fetch error messages and add timeout ([7ef3416](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/7ef3416e91791557cfacd210df4421733480cfc7))
+* limit forecast days to available data ([600c4c1](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/600c4c164fc851085d99f9edc5239a0f063d6a13))
+* report missing coordinates to the frontend ([297f210](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/297f2100a78fbb10291bc9f29253d106e4631df7))
+* show forecast weekdays in the time zone of the location ([b530786](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/b530786cae06a9be2d591a089ae80f21ded510f9))
+
+### Performance Improvements
+
+* stop requesting and processing unused hourly data ([e3ac74e](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/e3ac74ec7a2d71e43a136e1fa9d92d826e28dfa5))
+
+### Documentation
+
+* add SECRET_ API key setup and use it in the demo ([6f813c1](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/6f813c182bca68027bb9d98ef650e87dda619b71))
+
+### Chores
+
+* remove dead options and properties ([4f9ce7a](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/4f9ce7af22fb92b71ede1c155d4fc66b4db49bc2))
+* update devDependencies ([fb50391](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/fb50391eb5ec9116dde931ff0df026097f6d5d05))
+
+### Code Refactoring
+
+* avoid innerHTML for text and API data ([0f00969](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/0f00969faa9a5953bcbc23f764c6ac97f9caab85))
+* move scheduling and caching to node helper ([efb6737](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/efb673739be30b9c11c1ff78386a26a06c380fe1))
+* remove onlyTemp, document showFeelsLike and maxDailiesToShow ([9404ac7](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/9404ac75d1dc60a17259bde632a71d57b2522b75))
+* remove tempUnits option that did not work properly ([091802b](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/091802ba5ab18add9c050dd816946545cea02e62))
+* remove undocumented exclude option and always skip minutely and hourly ([c2cfd06](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/c2cfd06ef6b61ee5a1cb4cfbc457520d056f9511))
+* remove unused fields from the processed weather data ([4688089](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/468808907bc30a7cc5ed5a70a3e0f6a61158ad03))
+* remove unused labelOrdinals option and getOrdinal ([0227b6a](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/0227b6abad928b92f18ea89da639d97b42b17c82))
+* share forecast cell creation between row and column layouts ([a4cc7c9](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/a4cc7c98fc687f85f570f312d2dfb96d17acc092))
+
+### Tests
+
+* add focused DOM rendering tests with a minimal fake DOM ([7432205](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/commit/74322054355cb23802e44feaaccb700e76671a38))
+
 ## [3.6.2](https://github.com/KristjanESPERANTO/MMM-OneCallWeather/compare/v3.6.1...v3.6.2) (2026-09-30)
 
 ### Fixed
