@@ -25,7 +25,6 @@ Module.register('MMM-OneCallWeather', {
     initialLoadDelay: 2500, // 2.5 seconds delay. This delay is used to keep the OpenWeather API happy.
     updateInterval: 10 * 60 * 1000, // every 10 minutes
     animationSpeed: 1000,
-    updateFadeSpeed: 500,
 
     decimalSymbol: '.',
     scale: false,
@@ -64,11 +63,7 @@ Module.register('MMM-OneCallWeather', {
       'NW',
       'NNW',
     ],
-    moduleTimestampIdPrefix: 'OPENWEATHER_ONE_CALL_TIMESTAMP_',
   },
-
-  // create a variable for the first upcoming calendar event. Used if no location is specified.
-  firstEvent: false,
 
   // Define required CSS files.
   getStyles() {
@@ -173,7 +168,6 @@ Module.register('MMM-OneCallWeather', {
 
     // get hourly weather, if requested
     const hours = []
-    this.hourForecast = []
     let forecastData
 
     if (Object.hasOwn(data, 'hourly')) {
@@ -220,9 +214,7 @@ Module.register('MMM-OneCallWeather', {
       }
     }
 
-    // get daily weather, if requested
-    this.dayForecast = []
-
+    // daily data is missing when excluded via config.exclude
     const days = []
     if (Object.hasOwn(data, 'daily')) {
       for (const day of data.daily) {
