@@ -43,25 +43,6 @@ Module.register('MMM-OneCallWeather', {
     showAlertsHours: 12,
     forecastLayout: 'columns', // "columns" (days as columns) or "rows" (days as rows)
     arrangement: 'vertical', // "vertical" (forecast below current) or "horizontal" (forecast next to current)
-
-    labelOrdinals: [
-      'N',
-      'NNE',
-      'NE',
-      'ENE',
-      'E',
-      'ESE',
-      'SE',
-      'SSE',
-      'S',
-      'SSW',
-      'SW',
-      'WSW',
-      'W',
-      'WNW',
-      'NW',
-      'NNW',
-    ],
   },
 
   // Define required CSS files.
@@ -601,10 +582,6 @@ Module.register('MMM-OneCallWeather', {
     }
 
     return table
-  },
-
-  getOrdinal(bearing) {
-    return this.utils.getOrdinal(bearing, this.config.labelOrdinals)
   },
 
   cardinalWindDirection(windDir) {

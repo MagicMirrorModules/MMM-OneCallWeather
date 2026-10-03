@@ -189,17 +189,6 @@ export function cardinalWindDirection(windDir) {
 }
 
 /**
- * Get ordinal wind direction label from bearing.
- *
- * @param {number} bearing - Wind bearing in degrees (0-360).
- * @param {string[]} labelOrdinals - Array of 16 ordinal labels (N, NNE, NE, ...).
- * @returns {string} Ordinal label from the array.
- */
-export function getOrdinal(bearing, labelOrdinals) {
-  return labelOrdinals[Math.round(bearing * 16 / 360) % 16]
-}
-
-/**
  * Calculates snow-to-water ratio based on temperature.
  * Provides a scientific estimate of how much snow depth results
  * from a given amount of liquid water equivalent.
