@@ -1,114 +1,106 @@
+/*
+ * Demo config: shows several variants of the module side by side.
+ *
+ * The API key is a MagicMirror secret: it stays on the server and is not sent to the browser.
+ * Provide it as environment variable SECRET_OWM_KEY (without it the requests fail with an authorization error):
+ *
+ *   File next to this one named demo.config.env (ignored by git), containing the line:
+ *     SECRET_OWM_KEY=<your key>
+ *   Current terminal only (without leaving the key in the shell history):
+ *     read -rs SECRET_OWM_KEY && export SECRET_OWM_KEY
+ *   All new terminals (add once to ~/.bashrc, then open a new terminal):
+ *     export SECRET_OWM_KEY=<your key>
+ *   Single run only:
+ *     SECRET_OWM_KEY=<your key> node --run demo
+ *
+ * Start the demo with:
+ *   node --run demo
+ *   DEMO_ALERT=1 node --run demo   (injects a test alert if there is none)
+ */
+const apikey = '${SECRET_OWM_KEY}'
+
 let config = {
   address: '0.0.0.0',
   ipWhitelist: [],
   logLevel: ['INFO', 'LOG', 'WARN', 'ERROR', 'DEBUG'],
+  language: 'en',
+  units: 'metric',
   modules: [
     {
       module: 'clock',
-      position: 'middle_center',
-    },
-
-    {
-      disabled: true,
-      module: 'MMM-OneCallWeather',
       position: 'top_right',
-      header: 'TOTO',
-      config:
-                    {
-                      latitude: 45.466667,
-                      longitude: -73.75,
-                      apikey: 'YOUR_API_KEY',
-                      iconset: '4a',
-                      iconsetFormat: 'png',
-                      layout: 'vertical',
-                    },
     },
-
     {
-      disabled: true,
       module: 'MMM-OneCallWeather',
-      header: 'Weather in London',
-      position: 'top_right',
+      position: 'top_left',
+      header: 'London - default',
       config: {
-        colored: false,
+        apikey,
+        latitude: 51.500149,
+        longitude: -0.12624,
+        showFeelsLike: true,
+      },
+    },
+    {
+      module: 'MMM-OneCallWeather',
+      position: 'top_center',
+      header: 'Bergen - rows, SVG icons, decimal comma',
+      config: {
+        apikey,
+        latitude: 60.3913,
+        longitude: 5.3221,
+        showFeelsLike: true,
+        forecastLayout: 'rows',
         iconset: '9a',
         iconsetFormat: 'svg',
-
-        latitude: '51.500149',
-        longitude: '-0.126240',
-        apikey: 'YOUR_API_KEY',
+        roundTemp: false,
+        decimalSymbol: ',',
+        scale: true,
+        windUnits: 'kmph',
+        showWindSpeedUnit: true,
       },
     },
     {
-      disabled: true,
-      module: 'MMM-OneCallWeather',
-      position: 'top_left',
-      header: 'TOTO',
-      config: {
-        latitude: '45.466667',
-        longitude: '-73.75',
-        apikey: 'YOUR_API_KEY',
-        iconset: '4a',
-        iconsetFormat: 'png',
-      },
-    },
-    {
-      disabled: true,
-      module: 'MMM-OneCallWeather',
-      position: 'top_left',
-      header: 'TOTO',
-      config: {
-        layout: 'vertical',
-        latitude: '45.466667',
-        longitude: '-73.75',
-        apikey: 'YOUR_API_KEY',
-        iconset: '4a',
-        iconsetFormat: 'png',
-      },
-    },
-
-    {
-      disabled: true,
-      module: 'MMM-OneCallWeather',
-      position: 'top_left',
-      header: 'Weather in London',
-      config: {
-        latitude: '51.500149',
-        longitude: '-0.126240',
-        apikey: 'YOUR_API_KEY',
-        displayMode: 'both-vertical',
-      },
-    },
-    {
-      disabled: false,
-      module: 'MMM-OneCallWeather',
-      position: 'top_left',
-      header: 'Weather in London',
-      config: {
-        layout: 'vertical',
-        latitude: '51.500149',
-        longitude: '-0.126240',
-        apikey: 'YOUR_API_KEY',
-        showCurrent: true,
-        showForecast: true,
-        showAlerts: true,
-        forecastLayout: 'columns',
-        arrangement: 'horizontal',
-      },
-    },
-    {
-      disabled: false,
       module: 'MMM-OneCallWeather',
       position: 'top_right',
-      header: 'Weather Alerts Test (Oklahoma)',
+      header: 'Oklahoma City - alerts, imperial units',
       config: {
-        latitude: '35.4676', // Oklahoma City (Tornado Alley)
-        longitude: '-97.5164',
-        apikey: 'YOUR_API_KEY',
-        showCurrent: true,
+        apikey,
+        latitude: 35.4676,
+        longitude: -97.5164,
+        units: 'imperial',
+        showFeelsLike: true,
         showForecast: false,
-        showAlerts: true, // Test alerts feature
-        colored: true,
+        showAlertsHours: 24,
+        showWindDirectionAsArrow: true,
+        showWindSpeedUnit: true,
+      },
+    },
+    {
+      module: 'MMM-OneCallWeather',
+      position: 'bottom_left',
+      header: 'Sapporo - horizontal, snow, Beaufort',
+      config: {
+        apikey,
+        latitude: 43.0618,
+        longitude: 141.3545,
+        showFeelsLike: true,
+        arrangement: 'horizontal',
+        maxDailiesToShow: 5,
+        useBeaufortInCurrent: true,
+      },
+    },
+    {
+      module: 'MMM-OneCallWeather',
+      position: 'bottom_right',
+      header: 'Honolulu - forecast only',
+      config: {
+        apikey,
+        latitude: 21.3069,
+        longitude: -157.8583,
+        showFeelsLike: true,
+        showCurrent: false,
+        colored: false,
       },
     },
   ],
