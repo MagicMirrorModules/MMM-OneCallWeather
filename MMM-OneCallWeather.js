@@ -122,7 +122,7 @@ Module.register('MMM-OneCallWeather', {
     }
     else if (notification === 'OPENWEATHER_ONECALL_ERROR' && payload.identifier === this.identifier) {
       Log.error(`${this.name}: Failed to fetch weather data: ${payload.error}`)
-      this.errorMessage = payload.error
+      this.errorMessage = payload.translationKey ? this.translate(payload.translationKey) : payload.error
       // Only redraw for the error state if we never managed to load data before
       if (!this.loaded) {
         this.updateDom()
@@ -286,9 +286,7 @@ Module.register('MMM-OneCallWeather', {
     }
 
     if (!this.loaded) {
-      wrapper.innerHTML = this.errorMessage
-        ? `Error loading weather data: ${this.errorMessage}`
-        : this.translate('LOADING')
+      wrapper.innerHTML = this.errorMessage || this.translate('LOADING')
       wrapper.className = 'dimmed light small'
       return wrapper
     }

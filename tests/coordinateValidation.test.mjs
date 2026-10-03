@@ -131,6 +131,32 @@ describe('node helper instance state', () => {
     assert.equal(notifications.length, 2)
     assert.equal(notifications[0].notification, 'OPENWEATHER_ONECALL_ERROR')
     assert.equal(notifications[0].payload.error, 'HTTP 401: Invalid API key.')
+    assert.equal(notifications[0].payload.translationKey, 'MODULE_ERROR_UNAUTHORIZED')
     assert.deepEqual(notifications[1], notifications[0])
+  })
+
+  it('should map a rate limit response to the rate limited translation key', async () => {
+    const { helper, notifications } = createNodeHelper(() => Promise.resolve({
+      ok: false,
+      status: 429,
+      statusText: 'Too Many Requests',
+      json: () => Promise.resolve({}),
+    }))
+
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', baseConfig)
+
+    assert.equal(notifications[0].payload.error, 'HTTP 429: Too Many Requests')
+    assert.equal(notifications[0].payload.translationKey, 'MODULE_ERROR_RATE_LIMITED')
+  })
+
+  it('should map a network failure to the no connection translation key', async () => {
+    const { helper, notifications } = createNodeHelper(() => Promise.reject(
+      Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } }),
+    ))
+
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', baseConfig)
+
+    assert.equal(notifications[0].payload.error, 'fetch failed (ENOTFOUND)')
+    assert.equal(notifications[0].payload.translationKey, 'MODULE_ERROR_NO_CONNECTION')
   })
 })

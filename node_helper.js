@@ -20,6 +20,27 @@
 const NodeHelper = require('node_helper')
 const Log = require('logger')
 
+// Maps a failed request to one of the MODULE_ERROR_* keys of the MagicMirror core translations
+function getErrorTranslationKey(error) {
+  const { status } = error
+  if (status === 401 || status === 403) {
+    return 'MODULE_ERROR_UNAUTHORIZED'
+  }
+  if (status === 429) {
+    return 'MODULE_ERROR_RATE_LIMITED'
+  }
+  if (status >= 500) {
+    return 'MODULE_ERROR_SERVER_ERROR'
+  }
+  if (status >= 400) {
+    return 'MODULE_ERROR_CLIENT_ERROR'
+  }
+  if (error.name === 'TimeoutError' || error.cause?.code) {
+    return 'MODULE_ERROR_NO_CONNECTION'
+  }
+  return 'MODULE_ERROR_UNSPECIFIED'
+}
+
 module.exports = NodeHelper.create({
   // Keyed by module identifier: { config, timer, lastData, lastError }
   instances: {},
@@ -94,7 +115,9 @@ module.exports = NodeHelper.create({
       const response = await fetch(url, { signal: AbortSignal.timeout(15000) })
       if (!response.ok) {
         const body = await response.json().catch(() => ({}))
-        throw new Error(`HTTP ${response.status}: ${body.message || response.statusText}`)
+        const requestError = new Error(`HTTP ${response.status}: ${body.message || response.statusText}`)
+        requestError.status = response.status
+        throw requestError
       }
 
       const data = await response.json()
@@ -127,7 +150,11 @@ module.exports = NodeHelper.create({
       const reason = error.cause?.code ? `${error.message} (${error.cause.code})` : error.message
       Log.error(`Failed to fetch weather data for ${config.latitude},${config.longitude}: ${reason}`)
       // Send error to frontend so module doesn't stay in "Loading..." state
-      instance.lastError = { identifier: config.identifier, error: reason }
+      instance.lastError = {
+        identifier: config.identifier,
+        error: reason,
+        translationKey: getErrorTranslationKey(error),
+      }
       this.sendSocketNotification('OPENWEATHER_ONECALL_ERROR', instance.lastError)
     }
 
