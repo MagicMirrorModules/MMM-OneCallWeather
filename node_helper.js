@@ -28,6 +28,10 @@ module.exports = NodeHelper.create({
       const coordinatesMissing = coordinates.some(coordinate => !coordinate && coordinate !== 0)
       if (coordinatesMissing) {
         Log.error('Latitude and/or longitude not provided.')
+        this.sendSocketNotification('OPENWEATHER_ONECALL_ERROR', {
+          identifier: config.identifier,
+          error: 'Latitude and/or longitude not provided.',
+        })
         return
       }
 

@@ -76,15 +76,21 @@ describe('node helper coordinate validation', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
       }),
       missingCoordinates = [false, undefined, null, ''],
+      notifications = [],
+      context = {
+        sendSocketNotification(notification, payload) {
+          notifications.push({ notification, payload })
+        },
+      },
       requests = []
 
     missingCoordinates.forEach((missingCoordinate) => {
       requests.push(
-        helper.socketNotificationReceived.call({}, 'OPENWEATHER_ONECALL_GET', {
+        helper.socketNotificationReceived.call(context, 'OPENWEATHER_ONECALL_GET', {
           ...baseConfig,
           latitude: missingCoordinate,
         }),
-        helper.socketNotificationReceived.call({}, 'OPENWEATHER_ONECALL_GET', {
+        helper.socketNotificationReceived.call(context, 'OPENWEATHER_ONECALL_GET', {
           ...baseConfig,
           longitude: missingCoordinate,
         }),
@@ -94,5 +100,7 @@ describe('node helper coordinate validation', () => {
 
     assert.equal(requestCount, 0)
     assert.equal(errors.length, missingCoordinates.length * 2)
+    assert.equal(notifications.length, missingCoordinates.length * 2)
+    assert.ok(notifications.every(({ notification }) => notification === 'OPENWEATHER_ONECALL_ERROR'))
   })
 })
