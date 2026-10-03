@@ -95,25 +95,9 @@ Module.register('MMM-OneCallWeather', {
     this.forecast = []
     this.loaded = false
     this.errorMessage = null
-    this.scheduleUpdate(this.config.initialLoadDelay)
-    this.updateTimer = null
-  },
 
-  scheduleUpdate(delay) {
-    let nextLoad = this.config.updateInterval
-    if (typeof delay !== 'undefined' && delay >= 0) {
-      nextLoad = delay
-    }
-
-    const that = this
-    clearTimeout(this.updateTimer)
-    this.updateTimer = setTimeout(() => {
-      that.updateWeather()
-    }, nextLoad)
-  },
-
-  updateWeather() {
-    this.sendSocketNotification('OPENWEATHER_ONECALL_GET', {
+    // The node helper fetches periodically and pushes the results
+    this.sendSocketNotification('OPENWEATHER_ONECALL_INIT', {
       identifier: this.identifier,
       apikey: this.config.apikey,
       apiVersion: this.config.apiVersion,
@@ -122,6 +106,8 @@ Module.register('MMM-OneCallWeather', {
       longitude: this.config.longitude,
       units: this.config.units,
       language: this.config.language,
+      initialLoadDelay: this.config.initialLoadDelay,
+      updateInterval: this.config.updateInterval,
     })
   },
 
@@ -133,7 +119,6 @@ Module.register('MMM-OneCallWeather', {
       this.loaded = true
       this.errorMessage = null
       this.updateDom()
-      this.scheduleUpdate()
     }
     else if (notification === 'OPENWEATHER_ONECALL_ERROR' && payload.identifier === this.identifier) {
       Log.error(`${this.name}: Failed to fetch weather data: ${payload.error}`)
@@ -142,8 +127,6 @@ Module.register('MMM-OneCallWeather', {
       if (!this.loaded) {
         this.updateDom()
       }
-      // Retry on the normal schedule instead of getting stuck
-      this.scheduleUpdate()
     }
   },
 

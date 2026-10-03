@@ -12,11 +12,14 @@ const baseConfig = {
     identifier: 'weather',
     latitude: '51.5',
     longitude: '-0.1',
+    initialLoadDelay: 0,
+    updateInterval: 600000,
   },
   createNodeHelper = (fetchImpl) => {
     const debugMessages = [],
       errors = [],
       helperModule = { exports: {} },
+      notifications = [],
       logger = {
         debug: message => debugMessages.push(message),
         error: message => errors.push(message),
@@ -28,7 +31,7 @@ const baseConfig = {
       URL,
       fetch: fetchImpl,
       module: helperModule,
-      process: { env: {} },
+      process: { env: { mmTestMode: 'true' } },
       require(name) {
         if (name === 'node_helper') {
           return { create: definition => definition }
@@ -40,23 +43,21 @@ const baseConfig = {
       },
     })
 
-    return { helper: helperModule.exports, errors }
+    const helper = helperModule.exports
+    helper.sendSocketNotification = (notification, payload) => notifications.push({ notification, payload })
+
+    return { helper, errors, notifications }
   }
 
 describe('node helper coordinate validation', () => {
   it('should allow zero coordinates and request the API', async () => {
     const apiRequests = [],
-      { helper } = createNodeHelper((url) => {
+      { helper, notifications } = createNodeHelper((url) => {
         apiRequests.push(new URL(url))
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ current: {} }) })
-      }),
-      notifications = []
+      })
 
-    await helper.socketNotificationReceived.call({
-      sendSocketNotification(notification, payload) {
-        notifications.push({ notification, payload })
-      },
-    }, 'OPENWEATHER_ONECALL_GET', {
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', {
       ...baseConfig,
       latitude: 0,
       longitude: 0,
@@ -72,26 +73,20 @@ describe('node helper coordinate validation', () => {
 
   it('should reject missing coordinates before requesting the API', async () => {
     let requestCount = 0
-    const { errors, helper } = createNodeHelper(() => {
+    const { errors, helper, notifications } = createNodeHelper(() => {
         requestCount += 1
         return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
       }),
       missingCoordinates = [false, undefined, null, ''],
-      notifications = [],
-      context = {
-        sendSocketNotification(notification, payload) {
-          notifications.push({ notification, payload })
-        },
-      },
       requests = []
 
     missingCoordinates.forEach((missingCoordinate) => {
       requests.push(
-        helper.socketNotificationReceived.call(context, 'OPENWEATHER_ONECALL_GET', {
+        helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', {
           ...baseConfig,
           latitude: missingCoordinate,
         }),
-        helper.socketNotificationReceived.call(context, 'OPENWEATHER_ONECALL_GET', {
+        helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', {
           ...baseConfig,
           longitude: missingCoordinate,
         }),
@@ -103,5 +98,39 @@ describe('node helper coordinate validation', () => {
     assert.equal(errors.length, missingCoordinates.length * 2)
     assert.equal(notifications.length, missingCoordinates.length * 2)
     assert.ok(notifications.every(({ notification }) => notification === 'OPENWEATHER_ONECALL_ERROR'))
+  })
+})
+
+describe('node helper instance state', () => {
+  it('should replay the cached data to a reconnecting client without a new request', async () => {
+    let requestCount = 0
+    const { helper, notifications } = createNodeHelper(() => {
+      requestCount += 1
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ current: {} }) })
+    })
+
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', baseConfig)
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', baseConfig)
+
+    assert.equal(requestCount, 1)
+    assert.equal(notifications.length, 2)
+    assert.deepEqual(notifications[1], notifications[0])
+  })
+
+  it('should report the message of the API error and replay it', async () => {
+    const { helper, notifications } = createNodeHelper(() => Promise.resolve({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      json: () => Promise.resolve({ cod: 401, message: 'Invalid API key.' }),
+    }))
+
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', baseConfig)
+    await helper.socketNotificationReceived('OPENWEATHER_ONECALL_INIT', baseConfig)
+
+    assert.equal(notifications.length, 2)
+    assert.equal(notifications[0].notification, 'OPENWEATHER_ONECALL_ERROR')
+    assert.equal(notifications[0].payload.error, 'HTTP 401: Invalid API key.')
+    assert.deepEqual(notifications[1], notifications[0])
   })
 })
