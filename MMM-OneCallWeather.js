@@ -376,7 +376,7 @@ Module.register('MMM-OneCallWeather', {
     const hasAnyRain = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.rain > 0)
     const hasAnySnow = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.snow > 0)
 
-    for (let i = 0; i < this.config.maxDailiesToShow; i += 1) {
+    for (let i = 0; i < Math.min(this.config.maxDailiesToShow, this.forecast.days.length); i += 1) {
       const dailyForecast = this.forecast.days[i]
 
       const row = document.createElement('tr')
@@ -472,7 +472,7 @@ Module.register('MMM-OneCallWeather', {
     const hasAnyRain = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.rain > 0)
     const hasAnySnow = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.snow > 0)
 
-    for (let j = 0; j < this.config.maxDailiesToShow; j += 1) {
+    for (let j = 0; j < Math.min(this.config.maxDailiesToShow, this.forecast.days.length); j += 1) {
       const dailyForecast = this.forecast.days[j]
 
       // Day cell
