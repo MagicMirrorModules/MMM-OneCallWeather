@@ -289,16 +289,79 @@ Module.register('MMM-OneCallWeather', {
     return weatherContainer
   },
 
+  // Forecast days to show and whether any of them has rain or snow (empty cells show a dash then)
+  getVisibleForecastDays() {
+    const days = this.forecast.days.slice(0, this.config.maxDailiesToShow)
+    return {
+      days,
+      hasAnyRain: days.some(day => day.rain > 0),
+      hasAnySnow: days.some(day => day.snow > 0),
+    }
+  },
+
+  // Cells of one forecast day, shared by both layouts. "coloredCells": add the colored class to each cell instead of the row.
+  createForecastCells(dailyForecast, degreeLabel, { hasAnyRain, hasAnySnow, coloredCells }) {
+    const colored = coloredCells && this.config.colored ? ' colored' : ''
+    const createCell = (className, content) => {
+      const cell = document.createElement('td')
+      cell.className = className + colored
+      if (content !== undefined) {
+        cell.innerHTML = content
+      }
+      return cell
+    }
+    const amountHtml = (amount, unit) => {
+      const digits = this.config.units === 'imperial' ? 2 : 1
+      return `${this.formatAmount(amount, digits)} <span class="precip-unit">${unit}</span>`
+    }
+
+    const cells = {
+      day: createCell('day', dailyForecast.dayOfWeek),
+      icon: createCell('bright weather-icon'),
+      minTemp: createCell('min-temp', `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`),
+      maxTemp: createCell('bright max-temp', `${this.localizeDecimal(dailyForecast.maxTemperature)}${degreeLabel}`),
+    }
+
+    const icon = document.createElement('span')
+    const iconImg = document.createElement('img')
+    iconImg.className = 'forecast-icon'
+    iconImg.src = `modules/MMM-OneCallWeather/icons/${this.config.iconset}/${dailyForecast.weatherIcon}.${this.config.iconsetFormat}`
+    icon.appendChild(iconImg)
+    cells.icon.appendChild(icon)
+
+    if (this.config.showWind) {
+      cells.wind = createCell('bright weather-icon')
+      cells.wind.appendChild(this.createWindBadge(dailyForecast.windSpeed, dailyForecast.windDirection))
+    }
+
+    if (this.config.showRainAmount) {
+      const rainContent = dailyForecast.rain > 0
+        ? amountHtml(dailyForecast.rain, this.config.units === 'imperial' ? 'in' : 'mm')
+        : (hasAnyRain ? '—' : '')
+      cells.rain = createCell('align-right bright rain precip-rain', rainContent)
+    }
+
+    if (this.config.showSnowAmount) {
+      let snowContent = hasAnySnow ? '—' : ''
+      if (dailyForecast.snow > 0) {
+        const formatted = this.formatSnowValue(dailyForecast.snow, dailyForecast)
+        snowContent = amountHtml(formatted.value, formatted.unit)
+      }
+      cells.snow = createCell('align-right bright snow precip-snow', snowContent)
+    }
+
+    return cells
+  },
+
   // Forecast layout: "rows" - each day as a row (vertical list)
   createRowsForecastTable(degreeLabel) {
     const forecastTable = document.createElement('table')
     forecastTable.className = 'forecast-table small'
 
-    const hasAnyRain = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.rain > 0)
-    const hasAnySnow = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.snow > 0)
+    const { days, hasAnyRain, hasAnySnow } = this.getVisibleForecastDays()
 
-    for (let i = 0; i < Math.min(this.config.maxDailiesToShow, this.forecast.days.length); i += 1) {
-      const dailyForecast = this.forecast.days[i]
+    for (const dailyForecast of days) {
+      const cells = this.createForecastCells(dailyForecast, degreeLabel, { hasAnyRain, hasAnySnow, coloredCells: false })
 
       const row = document.createElement('tr')
       row.className = 'vertical-row'
@@ -307,70 +370,14 @@ Module.register('MMM-OneCallWeather', {
       }
       forecastTable.appendChild(row)
 
-      const dayCell = document.createElement('td')
-      dayCell.className = 'day'
-      dayCell.innerHTML = dailyForecast.dayOfWeek
-      row.appendChild(dayCell)
-
-      const iconCell = document.createElement('td')
-      iconCell.className = 'bright weather-icon'
-      const icon = document.createElement('span')
-      const iconImg = document.createElement('img')
-      iconImg.className = 'forecast-icon'
-      iconImg.src = `modules/MMM-OneCallWeather/icons/${this.config.iconset}/${dailyForecast.weatherIcon}.${this.config.iconsetFormat}`
-      icon.appendChild(iconImg)
-      iconCell.appendChild(icon)
-      row.appendChild(iconCell)
-
-      const minTempCell = document.createElement('td')
-      minTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`
-      minTempCell.className = 'min-temp'
-      row.appendChild(minTempCell)
-
       const tempSepCell = document.createElement('td')
       tempSepCell.className = 'temp-sep dimmed'
       tempSepCell.textContent = '–'
-      row.appendChild(tempSepCell)
 
-      const maxTempCell = document.createElement('td')
-      maxTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.maxTemperature)}${degreeLabel}`
-      maxTempCell.className = 'bright max-temp'
-      row.appendChild(maxTempCell)
-
-      if (this.config.showWind) {
-        const windCell = document.createElement('td')
-        windCell.className = 'bright weather-icon'
-        windCell.appendChild(this.createWindBadge(dailyForecast.windSpeed, dailyForecast.windDirection))
-        row.appendChild(windCell)
-      }
-
-      if (this.config.showRainAmount) {
-        const rainCell = document.createElement('td')
-        if (dailyForecast.rain > 0) {
-          rainCell.innerHTML = this.config.units === 'imperial'
-            ? `${this.formatAmount(dailyForecast.rain, 2)} <span class="precip-unit">in</span>`
-            : `${this.formatAmount(dailyForecast.rain, 1)} <span class="precip-unit">mm</span>`
+      for (const cell of [cells.day, cells.icon, cells.minTemp, tempSepCell, cells.maxTemp, cells.wind, cells.rain, cells.snow]) {
+        if (cell) {
+          row.appendChild(cell)
         }
-        else if (hasAnyRain) {
-          rainCell.innerHTML = '—'
-        }
-        rainCell.className = 'align-right bright rain precip-rain'
-        row.appendChild(rainCell)
-      }
-
-      if (this.config.showSnowAmount) {
-        const snowCell = document.createElement('td')
-        if (dailyForecast.snow > 0) {
-          const formatted = this.formatSnowValue(dailyForecast.snow, dailyForecast)
-          snowCell.innerHTML = this.config.units === 'imperial'
-            ? `${this.formatAmount(formatted.value, 2)} <span class="precip-unit">${formatted.unit}</span>`
-            : `${this.formatAmount(formatted.value, 1)} <span class="precip-unit">${formatted.unit}</span>`
-        }
-        else if (hasAnySnow) {
-          snowCell.innerHTML = '—'
-        }
-        snowCell.className = 'align-right bright snow precip-snow'
-        row.appendChild(snowCell)
       }
     }
 
@@ -382,123 +389,29 @@ Module.register('MMM-OneCallWeather', {
     const forecastTable = document.createElement('table')
     forecastTable.className = 'forecast-table small'
 
-    const dayRow = document.createElement('tr')
-    const iconRow = document.createElement('tr')
-    const maxTempRow = document.createElement('tr')
-    const minTempRow = document.createElement('tr')
-    const windRow = document.createElement('tr')
-    const rainRow = this.config.showRainAmount ? document.createElement('tr') : null
-    const snowRow = this.config.showSnowAmount ? document.createElement('tr') : null
-
-    const hasAnyRain = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.rain > 0)
-    const hasAnySnow = this.forecast.days.slice(0, this.config.maxDailiesToShow).some(day => day.snow > 0)
-
-    for (let j = 0; j < Math.min(this.config.maxDailiesToShow, this.forecast.days.length); j += 1) {
-      const dailyForecast = this.forecast.days[j]
-
-      // Day cell
-      const dayCell = document.createElement('td')
-      dayCell.className = 'day'
-      if (this.config.colored) {
-        dayCell.className += ' colored'
-      }
-      dayCell.innerHTML = dailyForecast.dayOfWeek
-      dayRow.appendChild(dayCell)
-
-      // Icon cell
-      const iconCell = document.createElement('td')
-      iconCell.className = 'bright weather-icon'
-      if (this.config.colored) {
-        iconCell.className += ' colored'
-      }
-      const icon = document.createElement('span')
-      const iconImg = document.createElement('img')
-      iconImg.className = 'forecast-icon'
-      iconImg.src = `modules/MMM-OneCallWeather/icons/${this.config.iconset}/${dailyForecast.weatherIcon}.${this.config.iconsetFormat}`
-      icon.appendChild(iconImg)
-      iconCell.appendChild(icon)
-      iconRow.appendChild(iconCell)
-
-      // Max temp cell
-      const maxTempCell = document.createElement('td')
-      maxTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.maxTemperature)}${degreeLabel}`
-      maxTempCell.className = 'bright max-temp'
-      if (this.config.colored) {
-        maxTempCell.className += ' colored'
-      }
-      maxTempRow.appendChild(maxTempCell)
-
-      // Min temp cell
-      const minTempCell = document.createElement('td')
-      minTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`
-      minTempCell.className = 'min-temp'
-      if (this.config.colored) {
-        minTempCell.className += ' colored'
-      }
-      minTempRow.appendChild(minTempCell)
-
-      // Wind cell
-      if (this.config.showWind) {
-        const windCell = document.createElement('td')
-        windCell.className = 'bright weather-icon'
-        if (this.config.colored) {
-          windCell.className += ' colored'
-        }
-        windCell.appendChild(this.createWindBadge(dailyForecast.windSpeed, dailyForecast.windDirection))
-        windRow.appendChild(windCell)
-      }
-
-      // Rain cell
-      if (this.config.showRainAmount) {
-        const rainCell = document.createElement('td')
-        if (dailyForecast.rain > 0) {
-          rainCell.innerHTML = this.config.units === 'imperial'
-            ? `${this.formatAmount(dailyForecast.rain, 2)} <span class="precip-unit">in</span>`
-            : `${this.formatAmount(dailyForecast.rain, 1)} <span class="precip-unit">mm</span>`
-        }
-        else if (hasAnyRain) {
-          rainCell.innerHTML = '—'
-        }
-        rainCell.className = 'align-right bright rain precip-rain'
-        if (this.config.colored) {
-          rainCell.className += ' colored'
-        }
-        rainRow.appendChild(rainCell)
-      }
-
-      // Snow cell
-      if (this.config.showSnowAmount) {
-        const snowCell = document.createElement('td')
-        if (dailyForecast.snow > 0) {
-          const formatted = this.formatSnowValue(dailyForecast.snow, dailyForecast)
-          snowCell.innerHTML = this.config.units === 'imperial'
-            ? `${this.formatAmount(formatted.value, 2)} <span class="precip-unit">${formatted.unit}</span>`
-            : `${this.formatAmount(formatted.value, 1)} <span class="precip-unit">${formatted.unit}</span>`
-        }
-        else if (hasAnySnow) {
-          snowCell.innerHTML = '—'
-        }
-        snowCell.className = 'align-right bright snow precip-snow'
-        if (this.config.colored) {
-          snowCell.className += ' colored'
-        }
-        snowRow.appendChild(snowCell)
-      }
-    }
-
-    // Append all rows to forecast table
-    forecastTable.appendChild(dayRow)
-    forecastTable.appendChild(iconRow)
-    forecastTable.appendChild(maxTempRow)
-    forecastTable.appendChild(minTempRow)
+    const rowNames = ['day', 'icon', 'maxTemp', 'minTemp']
     if (this.config.showWind) {
-      forecastTable.appendChild(windRow)
+      rowNames.push('wind')
     }
     if (this.config.showRainAmount) {
-      forecastTable.appendChild(rainRow)
+      rowNames.push('rain')
     }
     if (this.config.showSnowAmount) {
-      forecastTable.appendChild(snowRow)
+      rowNames.push('snow')
+    }
+    const rows = Object.fromEntries(rowNames.map(name => [name, document.createElement('tr')]))
+
+    const { days, hasAnyRain, hasAnySnow } = this.getVisibleForecastDays()
+
+    for (const dailyForecast of days) {
+      const cells = this.createForecastCells(dailyForecast, degreeLabel, { hasAnyRain, hasAnySnow, coloredCells: true })
+      for (const name of rowNames) {
+        rows[name].appendChild(cells[name])
+      }
+    }
+
+    for (const name of rowNames) {
+      forecastTable.appendChild(rows[name])
     }
 
     return forecastTable
