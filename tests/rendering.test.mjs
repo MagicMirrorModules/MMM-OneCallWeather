@@ -60,10 +60,9 @@ describe('current weather block', () => {
     assert.ok(byTag(table, 'span').some(span => span.textContent === 'Feels like 11,2°C'))
   })
 
-  it('should show the description only when enabled, available and not onlyTemp', () => {
+  it('should show the description only when enabled and available', () => {
     assert.equal(byClass(block(), 'weather-description')[0].textContent, 'broken clouds')
     assert.equal(byClass(block({ showDescription: false }), 'weather-description').length, 0)
-    assert.equal(byClass(block({ onlyTemp: true }), 'weather-description').length, 0)
     assert.equal(byClass(block({}, current({ weatherDescription: undefined })), 'weather-description').length, 0)
   })
 

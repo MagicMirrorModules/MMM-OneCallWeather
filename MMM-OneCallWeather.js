@@ -14,6 +14,7 @@ Module.register('MMM-OneCallWeather', {
     snowDensityFactor: 1.0,
     showWind: true,
     showWindDirection: true,
+    showWindDirectionAsArrow: false,
     showWindSpeedUnit: false,
     showHumidity: true,
     showCurrentRain: true,
@@ -33,7 +34,6 @@ Module.register('MMM-OneCallWeather', {
     iconset: '4a',
     iconsetFormat: 'png',
 
-    onlyTemp: false,
     maxDailiesToShow: 6,
     colored: true,
     roundTemp: true,
@@ -498,7 +498,7 @@ Module.register('MMM-OneCallWeather', {
     largeWeatherIcon.appendChild(currTemperature)
     currentCell2.appendChild(largeWeatherIcon)
 
-    if (this.config.showDescription && !this.config.onlyTemp && currentWeather.weatherDescription) {
+    if (this.config.showDescription && currentWeather.weatherDescription) {
       const description = document.createElement('div')
       description.className = 'weather-description small dimmed'
       description.textContent = currentWeather.weatherDescription
@@ -513,7 +513,7 @@ Module.register('MMM-OneCallWeather', {
     currentCell3.colSpan = colspan
     currentCell3.className = 'current'
 
-    if (this.config.showFeelsLike && this.config.onlyTemp === false) {
+    if (this.config.showFeelsLike) {
       const feelsLikeContainer = document.createElement('div')
       feelsLikeContainer.className = 'wind-container small dimmed'
       const currFeelsLike = document.createElement('span')
