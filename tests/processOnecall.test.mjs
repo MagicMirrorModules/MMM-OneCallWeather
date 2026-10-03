@@ -116,4 +116,28 @@ describe('processOnecall', () => {
 
     assert.equal(withoutDescription.current[0].weatherDescription, undefined)
   })
+
+  it('should name the weekday in the time zone of the location', () => {
+    // Noon on Monday, January 1st 2024 in Honolulu is already Tuesday morning in Auckland
+    const noonInHonolulu = Date.UTC(2024, 0, 1, 22) / 1000,
+      forecastFor = timezone => processWeatherData({
+        timezone,
+        timezone_offset: 0,
+        current: createCurrentWeather(),
+        daily: [{
+          dt: noonInHonolulu,
+          sunrise: noonInHonolulu,
+          sunset: noonInHonolulu,
+          temp: { min: 5, max: 10 },
+          humidity: 60,
+          wind_speed: 2,
+          wind_deg: 180,
+          feels_like: { day: 10 },
+          weather: [{ icon: '10d' }],
+        }],
+      })
+
+    assert.equal(forecastFor('Pacific/Honolulu').days[0].dayOfWeek, 'Mon')
+    assert.equal(forecastFor('Pacific/Auckland').days[0].dayOfWeek, 'Tue')
+  })
 })

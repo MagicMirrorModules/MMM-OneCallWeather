@@ -124,7 +124,7 @@ Module.register('MMM-OneCallWeather', {
 
   processOnecall(data) {
     const wsfactor = this.utils.getWindSpeedFactor(this.config.units, this.config.windUnits)
-    const weekdayFormatter = new Intl.DateTimeFormat(config.language, { weekday: 'short' })
+    const weekdayFormatter = new Intl.DateTimeFormat(config.language, { weekday: 'short', timeZone: data.timezone })
     const current = []
 
     if (Object.hasOwn(data, 'current')) {
