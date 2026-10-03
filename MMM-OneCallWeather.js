@@ -18,7 +18,6 @@ Module.register('MMM-OneCallWeather', {
     showHumidity: true,
     showCurrentRain: true,
     showFeelsLike: true,
-    tempUnits: 'c',
     windUnits: 'mph',
     useBeaufortInCurrent: false,
 
@@ -481,15 +480,7 @@ Module.register('MMM-OneCallWeather', {
 
       // Min temp cell
       const minTempCell = document.createElement('td')
-      if (this.config.tempUnits === 'f') {
-        minTempCell.innerHTML = ` ${(
-          dailyForecast.minTemperature * (9 / 5)
-          + 32
-        ).toFixed(0)}${degreeLabel}`
-      }
-      else {
-        minTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`
-      }
+      minTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`
       minTempCell.className = 'min-temp'
       if (this.config.colored) {
         minTempCell.className += ' colored'
@@ -668,15 +659,7 @@ Module.register('MMM-OneCallWeather', {
     }
     const currTemperature = document.createElement(elementType)
     currTemperature.className = 'large bright'
-    if (this.config.tempUnits === 'f') {
-      currTemperature.innerHTML = ` ${(
-        currentWeather.temperature * (9 / 5)
-        + 32
-      ).toFixed(0)}${degreeLabel}`
-    }
-    else {
-      currTemperature.innerHTML = ` ${this.localizeDecimal(currentWeather.temperature)}${degreeLabel}`
-    }
+    currTemperature.innerHTML = ` ${this.localizeDecimal(currentWeather.temperature)}${degreeLabel}`
 
     largeWeatherIcon.appendChild(currTemperature)
     currentCell2.appendChild(largeWeatherIcon)
@@ -695,17 +678,9 @@ Module.register('MMM-OneCallWeather', {
       const currFeelsLike = document.createElement('span')
       currFeelsLike.className = 'small dimmed'
 
-      if (this.config.tempUnits === 'f') {
-        currFeelsLike.innerHTML = ` ${(
-          currentWeather.feelsLikeTemp * (9 / 5)
-          + 32
-        ).toFixed(0)}${degreeLabel}`
-      }
-      else {
-        const feelsLikeString = this.translate('FEELS')
-        const feelsLikeText = feelsLikeString.replace('{DEGREE}', `${this.localizeDecimal(currentWeather.feelsLikeTemp)}${degreeLabel}`)
-        currFeelsLike.innerHTML = feelsLikeText
-      }
+      const feelsLikeString = this.translate('FEELS')
+      const feelsLikeText = feelsLikeString.replace('{DEGREE}', `${this.localizeDecimal(currentWeather.feelsLikeTemp)}${degreeLabel}`)
+      currFeelsLike.innerHTML = feelsLikeText
       feelsLikeContainer.appendChild(currFeelsLike)
       currentCell3.appendChild(feelsLikeContainer)
     }
