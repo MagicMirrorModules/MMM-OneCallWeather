@@ -27,7 +27,7 @@ Module.register('MMM-OneCallWeather', {
 
     decimalSymbol: '.',
     scale: false,
-    exclude: 'minutely',
+    exclude: 'minutely,hourly',
 
     tableClass: 'small',
     iconset: '4a',
@@ -165,54 +165,6 @@ Module.register('MMM-OneCallWeather', {
       Log.debug(`current weather is ${JSON.stringify(currently)}`)
     }
 
-    // get hourly weather, if requested
-    const hours = []
-    let forecastData
-
-    if (Object.hasOwn(data, 'hourly')) {
-      for (const hour of data.hourly) {
-        let rain = 0
-        let snow = 0
-
-        if (
-          Object.hasOwn(hour, 'rain')
-          && !Number.isNaN(hour.rain['1h'])
-        ) {
-          if (this.config.units === 'imperial') {
-            rain = hour.rain['1h'] / 25.4
-          }
-          else {
-            rain = hour.rain['1h']
-          }
-        }
-        if (
-          Object.hasOwn(hour, 'snow')
-          && !Number.isNaN(hour.snow['1h'])
-        ) {
-          if (this.config.units === 'imperial') {
-            snow = hour.snow['1h'] / 25.4
-          }
-          else {
-            snow = hour.snow['1h']
-          }
-        }
-
-        forecastData = {
-          date: new Date((hour.dt + data.timezone_offset) * 1000),
-          temperature: hour.temp,
-          humidity: hour.humidity,
-          windSpeed: hour.wind_speed,
-          windDirection: hour.wind_deg,
-          feelsLikeTemp: hour.feels_like.day,
-          weatherIcon: hour.weather[0].icon,
-          weatherType: this.convertWeatherType(hour.weather[0].icon),
-          rain,
-          snow,
-        }
-        hours.push(forecastData)
-      }
-    }
-
     // daily data is missing when excluded via config.exclude
     const days = []
     if (Object.hasOwn(data, 'daily')) {
@@ -239,7 +191,7 @@ Module.register('MMM-OneCallWeather', {
           }
         }
 
-        forecastData = {
+        const forecastData = {
           dayOfWeek: weekdayFormatter.format(day.dt * 1000),
           date: new Date((day.dt + data.timezone_offset) * 1000),
           sunrise: new Date((day.sunrise + data.timezone_offset) * 1000),
@@ -261,7 +213,6 @@ Module.register('MMM-OneCallWeather', {
     }
 
     return { current,
-      hours,
       days }
   },
 
