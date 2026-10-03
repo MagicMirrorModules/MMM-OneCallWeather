@@ -27,7 +27,6 @@ Module.register('MMM-OneCallWeather', {
 
     decimalSymbol: '.',
     scale: false,
-    exclude: 'minutely,hourly',
 
     tableClass: 'small',
     iconset: '4a',
@@ -94,7 +93,6 @@ Module.register('MMM-OneCallWeather', {
       identifier: this.identifier,
       apikey: this.config.apikey,
       apiVersion: this.config.apiVersion,
-      exclude: this.config.exclude,
       latitude: this.config.latitude,
       longitude: this.config.longitude,
       units: this.config.units,
@@ -165,7 +163,6 @@ Module.register('MMM-OneCallWeather', {
       Log.debug(`current weather is ${JSON.stringify(currently)}`)
     }
 
-    // daily data is missing when excluded via config.exclude
     const days = []
     if (Object.hasOwn(data, 'daily')) {
       for (const day of data.daily) {

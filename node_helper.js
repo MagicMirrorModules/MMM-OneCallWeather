@@ -104,7 +104,8 @@ module.exports = NodeHelper.create({
     const url = new URL(`https://api.openweathermap.org/data/${config.apiVersion}/onecall`)
     url.searchParams.set('lat', config.latitude)
     url.searchParams.set('lon', config.longitude)
-    url.searchParams.set('exclude', config.exclude)
+    // The module only shows current, daily and alerts
+    url.searchParams.set('exclude', 'minutely,hourly')
     url.searchParams.set('appid', config.apikey)
     url.searchParams.set('lang', config.language)
     if (config.units) {

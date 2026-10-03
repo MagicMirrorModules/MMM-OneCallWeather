@@ -6,7 +6,6 @@ import { runInNewContext } from 'node:vm'
 const baseConfig = {
     apikey: 'test-key',
     apiVersion: '3.0',
-    exclude: 'minutely',
     language: 'en',
     units: 'metric',
     identifier: 'weather',
@@ -66,6 +65,7 @@ describe('node helper coordinate validation', () => {
     assert.equal(apiRequests.length, 1)
     assert.equal(apiRequests[0].searchParams.get('lat'), '0')
     assert.equal(apiRequests[0].searchParams.get('lon'), '0')
+    assert.equal(apiRequests[0].searchParams.get('exclude'), 'minutely,hourly')
     assert.equal(notifications.length, 1)
     assert.equal(notifications[0].notification, 'OPENWEATHER_ONECALL_DATA')
     assert.equal(notifications[0].payload.identifier, baseConfig.identifier)
