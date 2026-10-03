@@ -100,6 +100,28 @@ export function roundValue(temperature, roundTemp) {
   return parseFloat(temperature).toFixed(decimals)
 }
 
+// OpenWeatherMap uses some country codes and POSIX-style codes where MagicMirror uses ISO 639-1/BCP 47.
+const OPENWEATHER_LANGUAGES = {
+  'cs': 'cz',
+  'ko': 'kr',
+  'nb': 'no',
+  'nn': 'no',
+  'pt-br': 'pt_br',
+  'zh-cn': 'zh_cn',
+  'zh-tw': 'zh_tw',
+}
+
+/**
+ * Convert a MagicMirror language code to the code OpenWeatherMap expects for the lang parameter.
+ *
+ * @param {string} [language] - MagicMirror language code, e.g. "cs" or "pt-br".
+ * @returns {string} OpenWeatherMap language code. Unsupported languages fall back to English on the API side.
+ */
+export function getOpenWeatherLanguage(language) {
+  const code = String(language ?? 'en').toLowerCase()
+  return OPENWEATHER_LANGUAGES[code] ?? code
+}
+
 /**
  * Replace the decimal point of a formatted number with the configured symbol.
  *

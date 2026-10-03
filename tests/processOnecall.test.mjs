@@ -100,4 +100,20 @@ describe('processOnecall', () => {
     assert.equal(result.current[0].dailyRain, 0)
     assert.equal(result.days.length, 0)
   })
+
+  it('should pass on the weather description and tolerate a missing one', () => {
+    const result = processWeatherData({
+      timezone_offset: 0,
+      current: createCurrentWeather({ weather: [{ icon: '04d', description: 'broken clouds' }] }),
+    })
+
+    assert.equal(result.current[0].weatherDescription, 'broken clouds')
+
+    const withoutDescription = processWeatherData({
+      timezone_offset: 0,
+      current: createCurrentWeather(),
+    })
+
+    assert.equal(withoutDescription.current[0].weatherDescription, undefined)
+  })
 })

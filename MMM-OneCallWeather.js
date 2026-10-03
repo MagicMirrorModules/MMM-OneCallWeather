@@ -18,6 +18,7 @@ Module.register('MMM-OneCallWeather', {
     showHumidity: true,
     showCurrentRain: true,
     showFeelsLike: true,
+    showDescription: true,
     windUnits: 'mph',
     useBeaufortInCurrent: false,
 
@@ -96,7 +97,7 @@ Module.register('MMM-OneCallWeather', {
       latitude: this.config.latitude,
       longitude: this.config.longitude,
       units: this.config.units,
-      language: this.config.language,
+      language: this.utils.getOpenWeatherLanguage(this.config.language ?? config.language),
       initialLoadDelay: this.config.initialLoadDelay,
       updateInterval: this.config.updateInterval,
     })
@@ -136,6 +137,7 @@ Module.register('MMM-OneCallWeather', {
         temperature: this.roundValue(data.current.temp),
         weatherIcon: data.current.weather[0].icon,
         weatherType: this.convertWeatherType(data.current.weather[0].icon),
+        weatherDescription: data.current.weather[0].description,
         humidity: data.current.humidity,
         feelsLikeTemp: data.current.feels_like.toFixed(1),
         precipitation: this.config.units === 'imperial'
@@ -611,6 +613,13 @@ Module.register('MMM-OneCallWeather', {
 
     largeWeatherIcon.appendChild(currTemperature)
     currentCell2.appendChild(largeWeatherIcon)
+
+    if (this.config.showDescription && !this.config.onlyTemp && currentWeather.weatherDescription) {
+      const description = document.createElement('div')
+      description.className = 'weather-description small dimmed'
+      description.textContent = currentWeather.weatherDescription
+      currentCell2.appendChild(description)
+    }
     currentRow2.appendChild(currentCell2)
     table.appendChild(currentRow2)
 
