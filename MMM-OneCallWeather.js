@@ -226,7 +226,7 @@ Module.register('MMM-OneCallWeather', {
     }
 
     if (!this.loaded) {
-      wrapper.innerHTML = this.errorMessage || this.translate('LOADING')
+      wrapper.textContent = this.errorMessage || this.translate('LOADING')
       wrapper.className = 'dimmed light small'
       return wrapper
     }
@@ -237,7 +237,7 @@ Module.register('MMM-OneCallWeather', {
 
     // Check if we have forecast data
     if (!this.forecast || !this.forecast.current || this.forecast.current.length === 0) {
-      wrapper.innerHTML = this.translate('LOADING')
+      wrapper.textContent = this.translate('LOADING')
       wrapper.className = 'dimmed light small'
       return wrapper
     }
@@ -302,17 +302,18 @@ Module.register('MMM-OneCallWeather', {
   // Cells of one forecast day, shared by both layouts. "coloredCells": add the colored class to each cell instead of the row.
   createForecastCells(dailyForecast, degreeLabel, { hasAnyRain, hasAnySnow, coloredCells }) {
     const colored = coloredCells && this.config.colored ? ' colored' : ''
-    const createCell = (className, content) => {
+    const createCell = (className, ...content) => {
       const cell = document.createElement('td')
       cell.className = className + colored
-      if (content !== undefined) {
-        cell.innerHTML = content
-      }
+      cell.append(...content.filter(Boolean))
       return cell
     }
-    const amountHtml = (amount, unit) => {
+    const amountNodes = (amount, unit) => {
       const digits = this.config.units === 'imperial' ? 2 : 1
-      return `${this.formatAmount(amount, digits)} <span class="precip-unit">${unit}</span>`
+      const unitSpan = document.createElement('span')
+      unitSpan.className = 'precip-unit'
+      unitSpan.textContent = unit
+      return [`${this.formatAmount(amount, digits)} `, unitSpan]
     }
 
     const cells = {
@@ -336,18 +337,18 @@ Module.register('MMM-OneCallWeather', {
 
     if (this.config.showRainAmount) {
       const rainContent = dailyForecast.rain > 0
-        ? amountHtml(dailyForecast.rain, this.config.units === 'imperial' ? 'in' : 'mm')
-        : (hasAnyRain ? '—' : '')
-      cells.rain = createCell('align-right bright rain precip-rain', rainContent)
+        ? amountNodes(dailyForecast.rain, this.config.units === 'imperial' ? 'in' : 'mm')
+        : [hasAnyRain ? '—' : '']
+      cells.rain = createCell('align-right bright rain precip-rain', ...rainContent)
     }
 
     if (this.config.showSnowAmount) {
-      let snowContent = hasAnySnow ? '—' : ''
+      let snowContent = [hasAnySnow ? '—' : '']
       if (dailyForecast.snow > 0) {
         const formatted = this.formatSnowValue(dailyForecast.snow, dailyForecast)
-        snowContent = amountHtml(formatted.value, formatted.unit)
+        snowContent = amountNodes(formatted.value, formatted.unit)
       }
-      cells.snow = createCell('align-right bright snow precip-snow', snowContent)
+      cells.snow = createCell('align-right bright snow precip-snow', ...snowContent)
     }
 
     return cells
@@ -441,22 +442,24 @@ Module.register('MMM-OneCallWeather', {
 
     const windySpeed = document.createElement('span')
     if (this.config.useBeaufortInCurrent) {
-      this.convSpd = this.mph2Beaufort(currentWeather.windSpeed)
-      windySpeed.innerHTML = `F${this.convSpd}`
+      windySpeed.textContent = `F${this.mph2Beaufort(currentWeather.windSpeed)}`
     }
     else {
       const unitLabel = this.config.showWindSpeedUnit ? `\u00a0${this.getWindSpeedLabel()}` : ''
-      windySpeed.innerHTML = `${currentWeather.windSpeed}${unitLabel}`
+      windySpeed.textContent = `${currentWeather.windSpeed}${unitLabel}`
     }
     windGroup.appendChild(windySpeed)
 
     if (this.config.showWindDirection) {
       const windyDirection = document.createElement('sup')
       if (this.config.showWindDirectionAsArrow) {
-        windyDirection.innerHTML = ` &nbsp;<i class="fa fa-long-arrow-down" style="transform:rotate(${currentWeather.windDirection}deg);"></i>&nbsp;`
+        const arrow = document.createElement('i')
+        arrow.className = 'fa fa-long-arrow-down'
+        arrow.style.transform = `rotate(${currentWeather.windDirection}deg)`
+        windyDirection.append(' \u00a0', arrow, '\u00a0')
       }
       else {
-        windyDirection.innerHTML = `\u00a0${this.cardinalWindDirection(currentWeather.windDirection)}`
+        windyDirection.textContent = `\u00a0${this.cardinalWindDirection(currentWeather.windDirection)}`
       }
       windGroup.appendChild(windyDirection)
     }
@@ -522,7 +525,7 @@ Module.register('MMM-OneCallWeather', {
     }
     const currTemperature = document.createElement(elementType)
     currTemperature.className = 'large bright'
-    currTemperature.innerHTML = ` ${this.localizeDecimal(currentWeather.temperature)}${degreeLabel}`
+    currTemperature.textContent = ` ${this.localizeDecimal(currentWeather.temperature)}${degreeLabel}`
 
     largeWeatherIcon.appendChild(currTemperature)
     currentCell2.appendChild(largeWeatherIcon)
@@ -550,7 +553,7 @@ Module.register('MMM-OneCallWeather', {
 
       const feelsLikeString = this.translate('FEELS')
       const feelsLikeText = feelsLikeString.replace('{DEGREE}', `${this.localizeDecimal(currentWeather.feelsLikeTemp)}${degreeLabel}`)
-      currFeelsLike.innerHTML = feelsLikeText
+      currFeelsLike.textContent = feelsLikeText
       feelsLikeContainer.appendChild(currFeelsLike)
       currentCell3.appendChild(feelsLikeContainer)
     }
