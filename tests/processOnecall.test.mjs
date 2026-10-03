@@ -31,7 +31,6 @@ const createCurrentWeather = (overrides = {}) => ({
       },
       utils,
       roundValue: moduleDefinition.roundValue,
-      convertWeatherType: moduleDefinition.convertWeatherType,
     }
 
     return moduleDefinition.processOnecall.call(instance, data)
@@ -76,17 +75,15 @@ describe('processOnecall', () => {
         }],
       })
 
-    assert.equal(result.current[0].date.toISOString(), new Date((apiTimestamp + 3600) * 1000).toISOString())
     assert.equal(result.current[0].temperature, '13')
     assert.equal(result.current[0].windSpeed, '18')
-    assert.equal(result.current[0].precipitation, 3)
     assert.equal(result.current[0].dailyRain, 6)
     assert.equal(result.days[0].minTemperature, '5')
     assert.equal(result.days[0].maxTemperature, '15')
     assert.equal(result.days[0].windSpeed, '7')
     assert.equal(result.days[0].rain, 4)
     assert.equal(result.days[0].snow, 2)
-    assert.equal(result.days[0].weatherType, 'day-rain')
+    assert.equal(result.days[0].weatherIcon, '10d')
   })
 
   it('should default missing precipitation values to zero', () => {
@@ -96,7 +93,6 @@ describe('processOnecall', () => {
       current: createCurrentWeather(),
     })
 
-    assert.equal(result.current[0].precipitation, 0)
     assert.equal(result.current[0].dailyRain, 0)
     assert.equal(result.days.length, 0)
   })

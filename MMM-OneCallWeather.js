@@ -129,20 +129,13 @@ Module.register('MMM-OneCallWeather', {
 
     if (Object.hasOwn(data, 'current')) {
       const currently = {
-        date: new Date((data.current.dt + data.timezone_offset) * 1000),
         windSpeed: (data.current.wind_speed * wsfactor).toFixed(0),
         windDirection: data.current.wind_deg,
-        sunrise: new Date((data.current.sunrise + data.timezone_offset) * 1000),
-        sunset: new Date((data.current.sunset + data.timezone_offset) * 1000),
         temperature: this.roundValue(data.current.temp),
         weatherIcon: data.current.weather[0].icon,
-        weatherType: this.convertWeatherType(data.current.weather[0].icon),
         weatherDescription: data.current.weather[0].description,
         humidity: data.current.humidity,
         feelsLikeTemp: data.current.feels_like.toFixed(1),
-        precipitation: this.config.units === 'imperial'
-          ? ((data.current.rain?.['1h'] || 0) + (data.current.snow?.['1h'] || 0)) / 25.4
-          : (data.current.rain?.['1h'] || 0) + (data.current.snow?.['1h'] || 0),
         dailyRain: (() => {
           const d = data.daily?.[0]
           if (!d) {
@@ -192,17 +185,11 @@ Module.register('MMM-OneCallWeather', {
 
         const forecastData = {
           dayOfWeek: weekdayFormatter.format(day.dt * 1000),
-          date: new Date((day.dt + data.timezone_offset) * 1000),
-          sunrise: new Date((day.sunrise + data.timezone_offset) * 1000),
-          sunset: new Date((day.sunset + data.timezone_offset) * 1000),
           minTemperature: this.roundValue(day.temp.min),
           maxTemperature: this.roundValue(day.temp.max),
-          humidity: day.humidity,
           windSpeed: (day.wind_speed * wsfactor).toFixed(0),
           windDirection: day.wind_deg,
-          feelsLikeTemp: day.feels_like.day,
           weatherIcon: day.weather[0].icon,
-          weatherType: this.convertWeatherType(day.weather[0].icon),
           rain,
           snow,
         }
@@ -656,13 +643,6 @@ Module.register('MMM-OneCallWeather', {
 
   formatAmount(value, digits) {
     return this.localizeDecimal(parseFloat(value).toFixed(digits))
-  },
-
-  /*
-   * Convert the OpenWeatherMap icons to a more usable name.
-   */
-  convertWeatherType(weatherType) {
-    return this.utils.convertWeatherType(weatherType)
   },
 
   /*
