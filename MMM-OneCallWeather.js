@@ -28,7 +28,6 @@ Module.register('MMM-OneCallWeather', {
     updateFadeSpeed: 500,
 
     decimalSymbol: '.',
-    fade: true,
     scale: false,
     exclude: 'minutely',
 
@@ -118,14 +117,14 @@ Module.register('MMM-OneCallWeather', {
       this.forecast = this.processOnecall(data)
       this.loaded = true
       this.errorMessage = null
-      this.updateDom()
+      this.updateDom(this.config.animationSpeed)
     }
     else if (notification === 'OPENWEATHER_ONECALL_ERROR' && payload.identifier === this.identifier) {
       Log.error(`${this.name}: Failed to fetch weather data: ${payload.error}`)
       this.errorMessage = payload.translationKey ? this.translate(payload.translationKey) : payload.error
       // Only redraw for the error state if we never managed to load data before
       if (!this.loaded) {
-        this.updateDom()
+        this.updateDom(this.config.animationSpeed)
       }
     }
   },
@@ -383,7 +382,7 @@ Module.register('MMM-OneCallWeather', {
       row.appendChild(iconCell)
 
       const minTempCell = document.createElement('td')
-      minTempCell.innerHTML = `${dailyForecast.minTemperature}${degreeLabel}`
+      minTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`
       minTempCell.className = 'min-temp'
       row.appendChild(minTempCell)
 
@@ -393,7 +392,7 @@ Module.register('MMM-OneCallWeather', {
       row.appendChild(tempSepCell)
 
       const maxTempCell = document.createElement('td')
-      maxTempCell.innerHTML = `${dailyForecast.maxTemperature}${degreeLabel}`
+      maxTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.maxTemperature)}${degreeLabel}`
       maxTempCell.className = 'bright max-temp'
       row.appendChild(maxTempCell)
 
@@ -408,8 +407,8 @@ Module.register('MMM-OneCallWeather', {
         const rainCell = document.createElement('td')
         if (dailyForecast.rain > 0) {
           rainCell.innerHTML = this.config.units === 'imperial'
-            ? `${parseFloat(dailyForecast.rain).toFixed(2)} <span class="precip-unit">in</span>`
-            : `${parseFloat(dailyForecast.rain).toFixed(1)} <span class="precip-unit">mm</span>`
+            ? `${this.formatAmount(dailyForecast.rain, 2)} <span class="precip-unit">in</span>`
+            : `${this.formatAmount(dailyForecast.rain, 1)} <span class="precip-unit">mm</span>`
         }
         else if (hasAnyRain) {
           rainCell.innerHTML = '—'
@@ -423,8 +422,8 @@ Module.register('MMM-OneCallWeather', {
         if (dailyForecast.snow > 0) {
           const formatted = this.formatSnowValue(dailyForecast.snow, dailyForecast)
           snowCell.innerHTML = this.config.units === 'imperial'
-            ? `${parseFloat(formatted.value).toFixed(2)} <span class="precip-unit">${formatted.unit}</span>`
-            : `${parseFloat(formatted.value).toFixed(1)} <span class="precip-unit">${formatted.unit}</span>`
+            ? `${this.formatAmount(formatted.value, 2)} <span class="precip-unit">${formatted.unit}</span>`
+            : `${this.formatAmount(formatted.value, 1)} <span class="precip-unit">${formatted.unit}</span>`
         }
         else if (hasAnySnow) {
           snowCell.innerHTML = '—'
@@ -481,7 +480,7 @@ Module.register('MMM-OneCallWeather', {
 
       // Max temp cell
       const maxTempCell = document.createElement('td')
-      maxTempCell.innerHTML = `${dailyForecast.maxTemperature}${degreeLabel}`
+      maxTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.maxTemperature)}${degreeLabel}`
       maxTempCell.className = 'bright max-temp'
       if (this.config.colored) {
         maxTempCell.className += ' colored'
@@ -497,7 +496,7 @@ Module.register('MMM-OneCallWeather', {
         ).toFixed(0)}${degreeLabel}`
       }
       else {
-        minTempCell.innerHTML = `${dailyForecast.minTemperature}${degreeLabel}`
+        minTempCell.innerHTML = `${this.localizeDecimal(dailyForecast.minTemperature)}${degreeLabel}`
       }
       minTempCell.className = 'min-temp'
       if (this.config.colored) {
@@ -521,8 +520,8 @@ Module.register('MMM-OneCallWeather', {
         const rainCell = document.createElement('td')
         if (dailyForecast.rain > 0) {
           rainCell.innerHTML = this.config.units === 'imperial'
-            ? `${parseFloat(dailyForecast.rain).toFixed(2)} <span class="precip-unit">in</span>`
-            : `${parseFloat(dailyForecast.rain).toFixed(1)} <span class="precip-unit">mm</span>`
+            ? `${this.formatAmount(dailyForecast.rain, 2)} <span class="precip-unit">in</span>`
+            : `${this.formatAmount(dailyForecast.rain, 1)} <span class="precip-unit">mm</span>`
         }
         else if (hasAnyRain) {
           rainCell.innerHTML = '—'
@@ -540,8 +539,8 @@ Module.register('MMM-OneCallWeather', {
         if (dailyForecast.snow > 0) {
           const formatted = this.formatSnowValue(dailyForecast.snow, dailyForecast)
           snowCell.innerHTML = this.config.units === 'imperial'
-            ? `${parseFloat(formatted.value).toFixed(2)} <span class="precip-unit">${formatted.unit}</span>`
-            : `${parseFloat(formatted.value).toFixed(1)} <span class="precip-unit">${formatted.unit}</span>`
+            ? `${this.formatAmount(formatted.value, 2)} <span class="precip-unit">${formatted.unit}</span>`
+            : `${this.formatAmount(formatted.value, 1)} <span class="precip-unit">${formatted.unit}</span>`
         }
         else if (hasAnySnow) {
           snowCell.innerHTML = '—'
@@ -646,8 +645,8 @@ Module.register('MMM-OneCallWeather', {
       const rainValue = document.createElement('span')
       const amount = currentWeather.dailyRain
       rainValue.textContent = this.config.units === 'imperial'
-        ? `${parseFloat(amount).toFixed(2)} in`
-        : `${parseFloat(amount).toFixed(1)} mm`
+        ? `${this.formatAmount(amount, 2)} in`
+        : `${this.formatAmount(amount, 1)} mm`
       rainContainer.appendChild(rainValue)
 
       windContainer.appendChild(rainContainer)
@@ -684,7 +683,7 @@ Module.register('MMM-OneCallWeather', {
       ).toFixed(0)}${degreeLabel}`
     }
     else {
-      currTemperature.innerHTML = ` ${currentWeather.temperature}${degreeLabel}`
+      currTemperature.innerHTML = ` ${this.localizeDecimal(currentWeather.temperature)}${degreeLabel}`
     }
 
     largeWeatherIcon.appendChild(currTemperature)
@@ -712,7 +711,7 @@ Module.register('MMM-OneCallWeather', {
       }
       else {
         const feelsLikeString = this.translate('FEELS')
-        const feelsLikeText = feelsLikeString.replace('{DEGREE}', `${currentWeather.feelsLikeTemp}${degreeLabel}`)
+        const feelsLikeText = feelsLikeString.replace('{DEGREE}', `${this.localizeDecimal(currentWeather.feelsLikeTemp)}${degreeLabel}`)
         currFeelsLike.innerHTML = feelsLikeText
       }
       feelsLikeContainer.appendChild(currFeelsLike)
@@ -809,6 +808,14 @@ Module.register('MMM-OneCallWeather', {
 
   roundValue(temperature) {
     return this.utils.roundValue(temperature, this.config.roundTemp)
+  },
+
+  localizeDecimal(value) {
+    return this.utils.localizeDecimal(value, this.config.decimalSymbol)
+  },
+
+  formatAmount(value, digits) {
+    return this.localizeDecimal(parseFloat(value).toFixed(digits))
   },
 
   /*

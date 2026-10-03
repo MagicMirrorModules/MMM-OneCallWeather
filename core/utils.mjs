@@ -101,6 +101,17 @@ export function roundValue(temperature, roundTemp) {
 }
 
 /**
+ * Replace the decimal point of a formatted number with the configured symbol.
+ *
+ * @param {number|string} value - Number or formatted number string.
+ * @param {string} decimalSymbol - Symbol to use as decimal separator.
+ * @returns {string} Number string with the given decimal symbol.
+ */
+export function localizeDecimal(value, decimalSymbol) {
+  return String(value).replace('.', decimalSymbol)
+}
+
+/**
  * Convert wind direction in degrees to cardinal direction abbreviation.
  *
  * @param {number} windDir - Wind direction in degrees (0-360).
