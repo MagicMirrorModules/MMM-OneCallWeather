@@ -24,6 +24,7 @@ const baseConfig = {
       source = readFileSync(new URL('../node_helper.js', import.meta.url), 'utf8')
 
     runInNewContext(source, {
+      AbortSignal,
       URL,
       fetch: fetchImpl,
       module: helperModule,

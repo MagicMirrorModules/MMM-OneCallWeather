@@ -46,9 +46,10 @@ module.exports = NodeHelper.create({
       }
 
       try {
-        const response = await fetch(url)
+        const response = await fetch(url, { signal: AbortSignal.timeout(15000) })
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          const body = await response.json().catch(() => ({}))
+          throw new Error(`HTTP ${response.status}: ${body.message || response.statusText}`)
         }
 
         const data = await response.json()
@@ -78,11 +79,13 @@ module.exports = NodeHelper.create({
         Log.debug('Sent the data back')
       }
       catch (error) {
-        Log.error(error)
+        // fetch reports network problems only as "fetch failed"; the real reason is in the cause
+        const reason = error.cause?.code ? `${error.message} (${error.cause.code})` : error.message
+        Log.error(`Failed to fetch weather data for ${config.latitude},${config.longitude}: ${reason}`)
         // Send error to frontend so module doesn't stay in "Loading..." state
         this.sendSocketNotification('OPENWEATHER_ONECALL_ERROR', {
           identifier: config.identifier,
-          error: error.message,
+          error: reason,
         })
       }
     }
