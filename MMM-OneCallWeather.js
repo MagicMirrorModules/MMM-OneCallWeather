@@ -76,6 +76,15 @@ Module.register('MMM-OneCallWeather', {
     return ['MMM-OneCallWeather.css']
   },
 
+  getTranslations() {
+    const languages = [
+      'en', 'af', 'ar', 'az', 'bg', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'es', 'et', 'fi', 'fr', 'fy', 'gl', 'gu',
+      'he', 'hi', 'hr', 'hu', 'id', 'is', 'it', 'ja', 'ko', 'lt', 'ms-my', 'nb', 'nl', 'nn', 'pl', 'pt', 'pt-br', 'ro',
+      'ru', 'sk', 'sv', 'th', 'tr', 'uk', 'zh-cn', 'zh-tw',
+    ]
+    return Object.fromEntries(languages.map(language => [language, `translations/${language}.json`]))
+  },
+
   // Define start sequence.
   async start() {
     Log.info(`Starting module: ${this.name}`)
@@ -768,7 +777,7 @@ Module.register('MMM-OneCallWeather', {
           const startTime = this.formatAlertTime(alert.start)
           const endTime = this.formatAlertTime(alert.end)
 
-          span.textContent = `${alert.event} (${startTime} - ${endTime})`
+          span.textContent = `${this.translate(alert.event)} (${startTime} - ${endTime})`
           span.className = 'weather-alert-link'
 
           span.addEventListener('click', () => {
@@ -903,7 +912,7 @@ Module.register('MMM-OneCallWeather', {
     const box = document.createElement('div')
     box.className = 'alert-box'
     const title = document.createElement('h2')
-    title.textContent = alert.event
+    title.textContent = this.translate(alert.event)
     const description = document.createElement('p')
     if (alert.description) {
       const lines = alert.description.split('\n')
@@ -915,17 +924,17 @@ Module.register('MMM-OneCallWeather', {
       })
     }
     else {
-      description.textContent = 'No additional details provided.'
+      description.textContent = this.translate('ALERT_NO_DETAILS')
     }
 
     const meta = document.createElement('p')
     meta.className = 'alert-meta'
-    meta.appendChild(document.createTextNode(`Source: ${alert.sender || 'NWS'}`))
+    meta.appendChild(document.createTextNode(`${this.translate('ALERT_SOURCE')}: ${alert.sender || 'NWS'}`))
     meta.appendChild(document.createElement('br'))
-    meta.appendChild(document.createTextNode(`Valid: ${this.formatAlertDateTime(alert.start)} – ${this.formatAlertDateTime(alert.end)}`))
+    meta.appendChild(document.createTextNode(`${this.translate('ALERT_VALID')}: ${this.formatAlertDateTime(alert.start)} – ${this.formatAlertDateTime(alert.end)}`))
     const closeButton = document.createElement('div')
     closeButton.className = 'alert-close'
-    closeButton.textContent = 'Click to close (or press ESC)'
+    closeButton.textContent = this.translate('ALERT_CLOSE')
     // Prevent clicks inside the box from bubbling to overlay
     box.addEventListener('click', e => e.stopPropagation())
     closeButton.addEventListener('click', removeOverlay)
